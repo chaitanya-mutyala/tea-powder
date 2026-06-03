@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { useCartStore } from '../store/cartStore';
 import { isLiveRazorpay } from '../config';
 import { useAdminStore } from '../store/adminStore';
+import { useAuthStore } from '../store/authStore';
 import { useNavigate } from 'react-router-dom';
 
 export default function Checkout() {
   const { items, clearCart } = useCartStore();
   const addOrder = useAdminStore(state => state.addOrder);
+  const user = useAuthStore(state => state.user);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -20,15 +22,22 @@ export default function Checkout() {
 
     if (!isLiveRazorpay) {
       setTimeout(async () => {
-        await addOrder({
-          customer: formData,
-          items,
-          total,
-          date: new Date().toISOString()
-        });
-        await clearCart();
-        setSuccess(true);
-        setLoading(false);
+        try {
+          await addOrder({
+            customer: formData,
+            items,
+            total,
+            date: new Date().toISOString(),
+            userId: user ? user.uid : 'guest'
+          });
+          await clearCart();
+          setSuccess(true);
+        } catch (error) {
+          console.error("Order creation failed:", error);
+          alert("Failed to place order: " + error.message + "\n\nDid you update your Firestore rules to allow guests to create orders?");
+        } finally {
+          setLoading(false);
+        }
       }, 1500);
       return;
     }
