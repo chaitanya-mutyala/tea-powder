@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { isLiveFirebase } from '../config';
 import { db, auth } from '../lib/firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 
@@ -9,7 +8,7 @@ const getLocalCart = () => {
 };
 
 const persistCart = async (items) => {
-  if (isLiveFirebase && auth?.currentUser) {
+  if (auth?.currentUser) {
     await setDoc(doc(db, 'carts', auth.currentUser.uid), { items });
   } else {
     localStorage.setItem('ambati_guest_cart', JSON.stringify(items));
@@ -55,8 +54,6 @@ export const useCartStore = create((set, get) => ({
   },
 
   mergeCartOnLogin: async (userUid) => {
-    if (!isLiveFirebase) return;
-
     const localItems = getLocalCart();
     try {
       const cartRef = doc(db, 'carts', userUid);

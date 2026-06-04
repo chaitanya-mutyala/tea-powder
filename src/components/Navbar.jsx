@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingBag, User, LogOut } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { useCartStore } from '../store/cartStore';
+import logo from '../assets/logo.png'
 
 export default function Navbar() {
   const { isAuthenticated, role, logout } = useAuthStore();
@@ -22,9 +23,9 @@ export default function Navbar() {
         <div className="flex justify-between h-16 items-center">
           <div className="flex-shrink-0 flex items-center">
             <Link to="/" className="flex items-center space-x-3 group">
-              <img 
-                src="https://images.unsplash.com/photo-1594489428504-5c0c480a15fd?auto=format&fit=crop&q=80&w=150" 
-                alt="Ambati vari Logo" 
+              <img
+                src={logo}
+                alt="Ambati vari Logo"
                 className="w-10 h-10 rounded-full object-cover border border-stone-200 group-hover:border-emerald-500 transition-colors"
               />
               <span className="text-2xl font-serif font-bold text-emerald-950 group-hover:text-emerald-800 transition-colors">
