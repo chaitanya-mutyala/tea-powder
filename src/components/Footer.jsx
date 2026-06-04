@@ -23,8 +23,8 @@ export default function Footer() {
           <h4 className="text-lg font-bold text-white mb-4">Contact Us</h4>
           <ul className="space-y-2 text-sm text-emerald-200">
             <li>Email: support@ambatitea.com</li>
-            <li>Phone: +91 98765 43210</li>
-            <li>Address: 123 Heritage Lane, Hyderabad, India</li>
+            <li>Phone: +91 8688466966</li>
+            <li>Address: amabati vari veedhi ,gopalapuram,konaseema</li>
           </ul>
         </div>
       </div>
