@@ -1,7 +1,9 @@
 import React from 'react';
 import { useCartStore } from '../store/cartStore';
 import { Link, useNavigate } from 'react-router-dom';
-import { Trash2, Plus, Minus } from 'lucide-react';
+import { Trash2, Plus, Minus, ArrowRight, ShoppingBag } from 'lucide-react';
+import EmptyState from '../components/ui/EmptyState';
+import { formatPrice } from '../lib/format';
 
 export default function Cart() {
   const { items, updateQuantity, removeFromCart } = useCartStore();
@@ -9,65 +11,123 @@ export default function Cart() {
 
   const total = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 0
-    }).format(price);
-  };
-
   if (items.length === 0) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-16 text-center">
-        <h2 className="text-3xl font-serif text-emerald-950 mb-4">Your Bag is Empty</h2>
-        <p className="text-stone-600 mb-8">Looks like you haven't added any items to your bag yet.</p>
-        <Link to="/" className="inline-block bg-emerald-900 text-white px-8 py-3 rounded-lg font-medium hover:bg-emerald-800 transition-colors shadow-sm">
-          Continue Shopping
-        </Link>
+      <div className="page-container py-16 sm:py-24 min-h-[60vh] flex flex-col justify-center">
+        <EmptyState
+          icon={ShoppingBag}
+          title="Your bag is empty"
+          description="Looks like you haven't added any items to your bag yet."
+          action={
+            <Link to="/" className="btn-primary rounded-full px-8 py-3.5 uppercase tracking-widest text-sm">
+              Continue Shopping <ArrowRight className="w-5 h-5" />
+            </Link>
+          }
+        />
       </div>
     );
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-12">
-      <h1 className="text-4xl font-serif text-emerald-950 mb-8">Your Bag</h1>
-      <div className="bg-white rounded-xl shadow-sm border border-stone-100 p-6 md:p-8">
-        <ul className="divide-y divide-stone-200 mb-8">
-          {items.map((item) => (
-            <li key={item.id} className="py-6 flex flex-col sm:flex-row items-center gap-6">
-              <img src={item.image} alt={item.title} className="w-24 h-24 object-cover rounded-lg bg-stone-100" />
-              <div className="flex-grow text-center sm:text-left">
-                <h3 className="text-lg font-serif font-semibold text-emerald-950 mb-1">{item.title}</h3>
-                <p className="text-sm text-stone-500">{item.weight}</p>
-                <div className="mt-2 font-bold text-emerald-900">{formatPrice(item.price)}</div>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="flex items-center border border-stone-300 rounded-lg overflow-hidden">
-                  <button onClick={() => updateQuantity(item.id, -1)} className="p-2 hover:bg-stone-100 text-stone-600 transition-colors">
-                    <Minus size={16} />
-                  </button>
-                  <span className="w-10 text-center font-medium text-stone-900">{item.quantity}</span>
-                  <button onClick={() => updateQuantity(item.id, 1)} className="p-2 hover:bg-stone-100 text-stone-600 transition-colors">
-                    <Plus size={16} />
-                  </button>
-                </div>
-                <button onClick={() => removeFromCart(item.id)} className="p-2 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors">
-                  <Trash2 size={20} />
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
-        <div className="border-t border-stone-200 pt-6 flex flex-col sm:flex-row items-center justify-between gap-6">
-          <div className="text-xl font-medium text-stone-900">
-            Total: <span className="text-2xl font-bold text-emerald-950 ml-2">{formatPrice(total)}</span>
+    <div className="page-container py-8 sm:py-12 lg:py-16 pb-28 lg:pb-16">
+      <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-emerald-950 mb-8 sm:mb-10 text-center">Your Bag</h1>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-10">
+        
+        <div className="lg:col-span-2">
+          <div className="card-elevated p-4 sm:p-6 lg:p-8">
+            <ul className="divide-y divide-cream-100">
+              {items.map((item) => (
+                <li key={item.id} className="py-5 sm:py-6 flex gap-4 sm:gap-6 first:pt-0 last:pb-0">
+                  <div className="relative w-20 h-20 sm:w-28 sm:h-28 rounded-xl overflow-hidden bg-cream-50 shrink-0 border border-cream-100">
+                    <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
+                  </div>
+                  
+                  <div className="flex-grow min-w-0 flex flex-col justify-center">
+                    <div className="text-[10px] sm:text-xs font-bold text-gold-600 uppercase tracking-widest mb-1">{item.category}</div>
+                    <h3 className="text-base sm:text-lg font-serif font-bold text-emerald-950 mb-1 line-clamp-2">{item.title}</h3>
+                    <p className="text-xs sm:text-sm text-emerald-900/60 mb-2">{item.weight}</p>
+                    <div className="text-lg sm:text-xl font-bold text-emerald-900 tabular-nums">{formatPrice(item.price)}</div>
+                  </div>
+                  
+                  <div className="flex flex-col items-end justify-between gap-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => removeFromCart(item.id)}
+                      className="btn-icon text-emerald-900/40 hover:text-red-500 -mr-1"
+                      aria-label="Remove item"
+                    >
+                      <Trash2 size={20} />
+                    </button>
+                    <div className="flex items-center bg-cream-50 border border-cream-200 rounded-full p-0.5">
+                      <button
+                        type="button"
+                        onClick={() => updateQuantity(item.id, -1)}
+                        className="btn-icon min-w-9 min-h-9 hover:bg-cream-200 rounded-full text-emerald-950"
+                        aria-label="Decrease quantity"
+                      >
+                        <Minus size={16} />
+                      </button>
+                      <span className="w-8 sm:w-10 text-center font-bold text-emerald-950 text-sm tabular-nums">{item.quantity}</span>
+                      <button
+                        type="button"
+                        onClick={() => updateQuantity(item.id, 1)}
+                        className="btn-icon min-w-9 min-h-9 hover:bg-cream-200 rounded-full text-emerald-950"
+                        aria-label="Increase quantity"
+                      >
+                        <Plus size={16} />
+                      </button>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
           </div>
-          <button 
+        </div>
+
+        <div className="lg:col-span-1">
+          <div className="bg-emerald-950 text-cream-50 p-6 sm:p-8 rounded-2xl sm:rounded-3xl shadow-xl lg:sticky lg:top-28">
+            <h3 className="text-xl sm:text-2xl font-serif font-bold text-gold-400 mb-6 sm:mb-8">Order Summary</h3>
+            <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8 text-sm sm:text-base">
+              <div className="flex justify-between items-center text-emerald-100/80">
+                <span>Subtotal</span>
+                <span className="tabular-nums">{formatPrice(total)}</span>
+              </div>
+              <div className="flex justify-between items-center text-emerald-100/80">
+                <span>Shipping</span>
+                <span className="text-right text-xs sm:text-sm">At checkout</span>
+              </div>
+            </div>
+            
+            <div className="border-t border-emerald-800 pt-5 sm:pt-6 mb-6 sm:mb-8 flex items-center justify-between">
+              <span className="text-base font-bold">Total</span>
+              <span className="text-2xl sm:text-3xl font-serif font-bold text-gold-400 tabular-nums">{formatPrice(total)}</span>
+            </div>
+            
+            <button 
+              type="button"
+              onClick={() => navigate('/checkout')}
+              className="w-full btn-accent rounded-full py-3.5 sm:py-4 uppercase tracking-widest text-sm shadow-lg"
+            >
+              Secure Checkout <ArrowRight className="w-5 h-5" />
+            </button>
+            <p className="text-center text-[10px] sm:text-xs text-emerald-100/50 mt-5 uppercase tracking-wider">Taxes included. Shipping calculated at checkout.</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile sticky checkout */}
+      <div className="lg:hidden fixed bottom-0 inset-x-0 z-30 bg-white/95 backdrop-blur-md border-t border-cream-200 p-4 safe-bottom">
+        <div className="flex items-center gap-4 max-w-lg mx-auto">
+          <div className="flex-1 min-w-0">
+            <p className="text-xs text-emerald-900/60 uppercase tracking-wider">Total</p>
+            <p className="text-xl font-bold text-emerald-950 tabular-nums">{formatPrice(total)}</p>
+          </div>
+          <button
+            type="button"
             onClick={() => navigate('/checkout')}
-            className="w-full sm:w-auto bg-amber-500 text-amber-950 px-10 py-3 rounded-lg font-bold text-lg hover:bg-amber-400 transition-colors shadow-sm"
+            className="btn-accent rounded-full px-6 py-3 uppercase tracking-wider text-sm shrink-0"
           >
-            Proceed to Checkout
+            Checkout
           </button>
         </div>
       </div>

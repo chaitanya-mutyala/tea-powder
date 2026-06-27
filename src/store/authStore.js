@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { auth } from '../lib/firebase';
 import { signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword } from 'firebase/auth';
 import { useCartStore } from './cartStore';
+import { useWishlistStore } from './wishlistStore';
 
 export const useAuthStore = create((set) => ({
   user: null,
@@ -15,8 +16,10 @@ export const useAuthStore = create((set) => ({
           const role = user.email === 'chaitanyamutyala456@gmail.com' ? 'admin' : 'customer';
           set({ user: { email: user.email, uid: user.uid }, role, isAuthenticated: true });
           useCartStore.getState().mergeCartOnLogin(user.uid);
+          useWishlistStore.getState().fetchWishlist();
         } else {
           set({ user: null, role: 'guest', isAuthenticated: false });
+          useWishlistStore.getState().fetchWishlist(); // will clear it
         }
       });
     }

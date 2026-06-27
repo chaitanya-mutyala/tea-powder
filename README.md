@@ -1,4 +1,4 @@
-# Ambati Vari Tea Podi
+# Advitha Milk Products
 
 An elegant, fully-featured e-commerce platform built for selling premium tea powders and authentic dairy products. The application features a stunning modern UI, seamless guest checkout, and a powerful Admin Dashboard for managing live orders.
 

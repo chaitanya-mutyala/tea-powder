@@ -1,51 +1,40 @@
 import React, { useState } from 'react';
 import { useAdminStore } from '../../store/adminStore';
-import { ChevronDown, ChevronUp, MapPin, Package, User, Calendar } from 'lucide-react';
+import { ChevronDown, ChevronUp, MapPin, Package, User, Calendar, FileText, CheckCircle, XCircle, Truck, PackageCheck, AlertCircle } from 'lucide-react';
+import { formatPrice, formatDate } from '../../lib/format';
+import { ORDER_STATUSES } from '../../lib/orderStatus';
+import EmptyState from '../../components/ui/EmptyState';
 
 export default function Orders() {
   const { orders, updateOrderStatus } = useAdminStore();
   const [activeFilter, setActiveFilter] = useState('All');
   const [expandedOrderId, setExpandedOrderId] = useState(null);
 
-  const statuses = ['Pending Payment', 'Paid / Processing', 'Shipped', 'Delivered'];
-  const filters = ['All', ...statuses];
+  const filters = ['All', ...ORDER_STATUSES];
 
   const filteredOrders = activeFilter === 'All' 
-    ? orders 
-    : orders.filter(o => o.status === activeFilter);
-
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(price);
-  };
-
-  const formatDate = (dateString) => {
-    try {
-      return new Intl.DateTimeFormat('en-IN', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(dateString));
-    } catch(e) {
-      return dateString || 'Unknown Date';
-    }
-  };
+    ? [...orders].sort((a, b) => new Date(b.date) - new Date(a.date))
+    : orders.filter(o => o.status === activeFilter).sort((a, b) => new Date(b.date) - new Date(a.date));
 
   const toggleExpand = (id) => {
-    if (expandedOrderId === id) {
-      setExpandedOrderId(null);
-    } else {
-      setExpandedOrderId(id);
-    }
+    setExpandedOrderId(expandedOrderId === id ? null : id);
   };
 
   return (
-    <div className="w-full">
-      <h1 className="text-2xl sm:text-3xl font-serif text-emerald-950 mb-6">Order Management</h1>
+    <div className="pb-8">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-semibold text-emerald-950 tracking-tight">Orders</h1>
+        <p className="text-sm text-stone-500 mt-1">{orders.length} total orders</p>
+      </div>
 
-      {/* Mobile-friendly horizontal scrolling filters */}
-      <div className="flex space-x-2 mb-6 overflow-x-auto pb-2 scrollbar-hide">
+      <div className="flex gap-2 mb-6 overflow-x-auto scrollbar-hide pb-1 -mx-4 px-4 sm:mx-0 sm:px-0">
         {filters.map(f => (
           <button
             key={f}
+            type="button"
             onClick={() => setActiveFilter(f)}
-            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors shadow-sm border ${
-              activeFilter === f ? 'bg-emerald-900 text-white border-emerald-900' : 'bg-white text-stone-600 hover:bg-stone-50 border-stone-200'
+            className={`px-3.5 py-2 rounded-lg text-xs font-semibold uppercase tracking-wide whitespace-nowrap shrink-0 min-h-10 transition-colors border ${
+              activeFilter === f ? 'bg-emerald-950 text-gold-400 border-emerald-950' : 'bg-white text-stone-600 hover:bg-stone-50 border-stone-200'
             }`}
           >
             {f}
@@ -55,126 +44,167 @@ export default function Orders() {
 
       <div className="space-y-4">
         {filteredOrders.length === 0 ? (
-          <div className="p-8 text-center bg-white rounded-xl shadow-sm border border-stone-200 text-stone-500">
-            No orders found.
+          <div className="bg-white rounded-xl border border-stone-200/80">
+            <EmptyState title="No orders found" description="Orders matching this filter will appear here." />
           </div>
         ) : (
           filteredOrders.map(order => (
-            <div key={order.id} className="bg-white rounded-xl shadow-sm border border-stone-200 overflow-hidden transition-all duration-200">
+            <div key={order.id} className="bg-white rounded-xl border border-stone-200/80 overflow-hidden hover:border-stone-300 transition-colors">
               
-              {/* Card Header (Always Visible) */}
-              <div 
-                className="p-4 sm:p-5 cursor-pointer hover:bg-stone-50 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4"
+              <div
+                className="p-4 sm:p-5 cursor-pointer hover:bg-stone-50/50 transition-colors"
                 onClick={() => toggleExpand(order.id)}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleExpand(order.id); } }}
+                role="button"
+                tabIndex={0}
+                aria-expanded={expandedOrderId === order.id}
               >
-                {/* Left Side: Order Meta */}
-                <div className="flex flex-col gap-2 w-full lg:w-auto flex-grow">
-                  <div className="flex items-center justify-between lg:justify-start gap-3">
-                    <span className="font-mono text-sm text-emerald-800 bg-emerald-50 px-2 py-1 rounded-md border border-emerald-100">
-                      #{order.id.slice(-8)}
-                    </span>
-                    <span className="text-sm text-stone-500 flex items-center gap-1">
-                      <Calendar className="w-4 h-4" /> {formatDate(order.date)}
-                    </span>
-                    {/* Mobile Expand Icon */}
-                    <div className="lg:hidden text-stone-400 p-1">
-                      {expandedOrderId === order.id ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+                  <div className="flex-1 min-w-0 space-y-2">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                      <span className="font-mono text-xs font-semibold text-emerald-900 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-100">
+                        #{order.id.slice(-8).toUpperCase()}
+                      </span>
+                      <span className="text-xs text-stone-500 flex items-center gap-1">
+                        <Calendar className="w-3.5 h-3.5" /> {formatDate(order.date)}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center shrink-0">
+                        <User className="w-4 h-4 text-stone-500" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-medium text-emerald-950 text-sm truncate">{order.customer?.name || 'Guest'}</p>
+                        <p className="text-xs text-stone-500 truncate">{order.customer?.email}</p>
+                      </div>
                     </div>
                   </div>
-                  
-                  <div className="flex items-center gap-2 mt-1">
-                    <User className="w-4 h-4 text-stone-400" />
-                    <span className="font-medium text-stone-900">{order.customer?.name || 'Guest Customer'}</span>
-                    <span className="text-sm text-stone-500 hidden sm:inline-block ml-2 border-l pl-2 border-stone-300">
-                      {order.customer?.email}
-                    </span>
-                  </div>
-                </div>
 
-                {/* Right Side: Price & Status */}
-                <div className="flex items-center justify-between w-full lg:w-auto gap-4 lg:gap-6 pt-3 border-t border-stone-100 lg:pt-0 lg:border-0">
-                  <div className="text-left lg:text-right">
-                    <p className="text-xs text-stone-500 uppercase tracking-wider mb-1">Total</p>
-                    <p className="font-bold text-emerald-950 text-lg">{formatPrice(order.total)}</p>
-                  </div>
-                  
-                  <div className="flex items-center gap-3" onClick={(e) => e.stopPropagation()}>
-                    <select
-                      value={order.status}
-                      onChange={(e) => updateOrderStatus(order.id, e.target.value)}
-                      className={`text-sm rounded-lg p-2 outline-none font-medium border-2 shadow-sm appearance-none cursor-pointer pr-8 ${
-                        order.status === 'Delivered' ? 'bg-green-50 border-green-200 text-green-800' :
-                        order.status === 'Shipped' ? 'bg-blue-50 border-blue-200 text-blue-800' :
-                        order.status === 'Paid / Processing' ? 'bg-amber-50 border-amber-200 text-amber-800' :
-                        'bg-stone-50 border-stone-200 text-stone-700'
-                      }`}
-                      style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em' }}
-                    >
-                      {statuses.map(s => (
-                        <option key={s} value={s}>{s}</option>
-                      ))}
-                    </select>
-                    
-                    {/* Desktop Expand Icon */}
-                    <div className="hidden lg:block text-stone-400 p-1 hover:bg-stone-200 rounded-full transition-colors">
-                      {expandedOrderId === order.id ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                  <div className="flex items-center justify-between lg:justify-end gap-4 pt-3 lg:pt-0 border-t lg:border-0 border-stone-100">
+                    <p className="font-semibold text-emerald-950 tabular-nums">{formatPrice(order.total)}</p>
+                    <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
+                      <select
+                        value={order.status}
+                        onChange={(e) => updateOrderStatus(order.id, e.target.value)}
+                        className="input-field py-2 text-xs font-semibold uppercase max-w-[10rem] sm:max-w-none"
+                      >
+                        {ORDER_STATUSES.map(s => (
+                          <option key={s} value={s}>{s}</option>
+                        ))}
+                      </select>
+                      {expandedOrderId === order.id ? <ChevronUp className="w-5 h-5 text-stone-400 shrink-0" /> : <ChevronDown className="w-5 h-5 text-stone-400 shrink-0" />}
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Card Body (Expanded Details) */}
               {expandedOrderId === order.id && (
-                <div className="p-4 sm:p-6 bg-stone-50 border-t border-stone-200 grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+                <div className="border-t border-stone-100 bg-stone-50/50">
                   
-                  {/* Shipping Details */}
-                  <div>
-                    <h3 className="text-sm font-bold text-stone-900 uppercase tracking-wider mb-4 flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-emerald-700" />
-                      Shipping Details
-                    </h3>
-                    <div className="bg-white p-4 rounded-lg border border-stone-200 shadow-sm">
-                      <p className="font-medium text-stone-900">{order.customer?.name}</p>
-                      <p className="text-stone-600 text-sm mb-3">{order.customer?.email}</p>
-                      <div className="pt-3 border-t border-stone-100">
-                        <p className="text-stone-700 text-sm leading-relaxed">
+                  <div className="p-3 sm:p-4 bg-emerald-950 flex flex-wrap gap-2 items-center">
+                     <p className="text-gold-400 font-semibold uppercase tracking-wider text-[10px] w-full sm:w-auto sm:mr-2">Quick actions</p>
+                     {order.status === 'Pending Verification' && (
+                       <>
+                         <button type="button" onClick={() => updateOrderStatus(order.id, 'Paid / Processing')} className="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded-lg text-xs font-semibold flex items-center min-h-10">
+                           <CheckCircle className="w-3.5 h-3.5 mr-1.5" /> Approve
+                         </button>
+                         <button type="button" onClick={() => updateOrderStatus(order.id, 'Cancelled')} className="bg-rose-600 hover:bg-rose-500 text-white px-3 py-2 rounded-lg text-xs font-semibold flex items-center min-h-10">
+                           <XCircle className="w-3.5 h-3.5 mr-1.5" /> Reject
+                         </button>
+                       </>
+                     )}
+                     {['Paid / Processing', 'Packed'].includes(order.status) && (
+                       <>
+                         <button type="button" onClick={() => updateOrderStatus(order.id, 'Packed')} className="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-2 rounded-lg text-xs font-semibold flex items-center min-h-10">
+                           <PackageCheck className="w-3.5 h-3.5 mr-1.5" /> Packed
+                         </button>
+                         <button type="button" onClick={() => updateOrderStatus(order.id, 'Shipped')} className="bg-sky-600 hover:bg-sky-500 text-white px-3 py-2 rounded-lg text-xs font-semibold flex items-center min-h-10">
+                           <Truck className="w-3.5 h-3.5 mr-1.5" /> Shipped
+                         </button>
+                       </>
+                     )}
+                     {order.status === 'Shipped' && (
+                       <button type="button" onClick={() => updateOrderStatus(order.id, 'Delivered')} className="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded-lg text-xs font-semibold flex items-center min-h-10">
+                         <CheckCircle className="w-3.5 h-3.5 mr-1.5" /> Delivered
+                       </button>
+                     )}
+                     {!['Cancelled', 'Delivered'].includes(order.status) && (
+                       <button type="button" onClick={() => updateOrderStatus(order.id, 'Cancelled')} className="bg-stone-700 hover:bg-stone-600 text-white px-3 py-2 rounded-lg text-xs font-semibold min-h-10 ml-auto">
+                         Cancel
+                       </button>
+                     )}
+                  </div>
+
+                  <div className="p-4 sm:p-6 grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
+                    <div>
+                      <h3 className="admin-section-title mb-3 flex items-center gap-2">
+                        <FileText className="w-4 h-4" /> Payment
+                      </h3>
+                      <div className="bg-white p-4 rounded-xl border border-stone-200 space-y-3">
+                        <div>
+                           <p className="text-[10px] uppercase tracking-wider text-stone-400 mb-1">Method</p>
+                           <p className="text-sm font-medium text-emerald-950">{order.payment?.method || 'UPI'}</p>
+                        </div>
+                        <div>
+                           <p className="text-[10px] uppercase tracking-wider text-stone-400 mb-1">UTR</p>
+                           <p className="font-mono text-sm font-medium text-emerald-800 bg-emerald-50 p-2 rounded border border-emerald-100 break-all">{order.payment?.utr || 'N/A'}</p>
+                        </div>
+                        {order.payment?.screenshotUrl && (
+                          <div>
+                            <p className="text-[10px] uppercase tracking-wider text-stone-400 mb-2">Screenshot</p>
+                            <a href={order.payment.screenshotUrl} target="_blank" rel="noopener noreferrer">
+                              <img src={order.payment.screenshotUrl} alt="Payment proof" className="w-full max-h-40 object-contain rounded-lg border border-stone-200 bg-stone-50" />
+                            </a>
+                          </div>
+                        )}
+                        {order.status === 'Pending Verification' && (
+                          <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg flex items-start gap-2">
+                            <AlertCircle className="w-4 h-4 text-orange-600 shrink-0 mt-0.5" />
+                            <p className="text-xs text-orange-800">Verify UTR and screenshot before approving.</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div>
+                      <h3 className="admin-section-title mb-3 flex items-center gap-2">
+                        <MapPin className="w-4 h-4" /> Shipping
+                      </h3>
+                      <div className="bg-white p-4 rounded-xl border border-stone-200">
+                        <p className="font-medium text-emerald-950">{order.customer?.name}</p>
+                        <p className="text-xs text-stone-500 mt-1 break-all">{order.customer?.email}</p>
+                        <p className="text-xs text-stone-500">{order.customer?.phone}</p>
+                        <div className="pt-3 mt-3 border-t border-stone-100 text-sm text-emerald-950 leading-relaxed">
                           {order.customer?.address}<br />
                           {order.customer?.city}, {order.customer?.zip}
-                        </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h3 className="admin-section-title mb-3 flex items-center gap-2">
+                        <Package className="w-4 h-4" /> Items
+                      </h3>
+                      <div className="bg-white rounded-xl border border-stone-200 overflow-hidden">
+                        <ul className="divide-y divide-stone-100 max-h-64 overflow-y-auto">
+                          {order.items?.map((item, index) => (
+                            <li key={index} className="p-3 flex gap-3 items-center">
+                              <img src={item.image} alt={item.title} className="w-12 h-12 rounded-lg object-cover bg-stone-50 shrink-0" />
+                              <div className="flex-grow min-w-0">
+                                <p className="font-medium text-emerald-950 text-sm truncate">{item.title}</p>
+                                <p className="text-xs text-stone-500">Qty {item.quantity} × {formatPrice(item.price)}</p>
+                              </div>
+                              <p className="font-semibold text-sm tabular-nums shrink-0">{formatPrice(item.price * item.quantity)}</p>
+                            </li>
+                          ))}
+                        </ul>
+                        <div className="p-3 bg-stone-50 border-t border-stone-100 flex justify-between items-center">
+                          <span className="admin-section-title">Total</span>
+                          <span className="font-semibold text-emerald-950 tabular-nums">{formatPrice(order.total)}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
-
-                  {/* Order Items */}
-                  <div>
-                    <h3 className="text-sm font-bold text-stone-900 uppercase tracking-wider mb-4 flex items-center gap-2">
-                      <Package className="w-4 h-4 text-emerald-700" />
-                      Ordered Items
-                    </h3>
-                    <div className="bg-white rounded-lg border border-stone-200 shadow-sm overflow-hidden">
-                      <ul className="divide-y divide-stone-100 max-h-64 overflow-y-auto">
-                        {order.items?.map((item, index) => (
-                          <li key={index} className="p-3 sm:p-4 flex gap-3 sm:gap-4 items-center">
-                            <div className="w-12 h-12 sm:w-16 sm:h-16 flex-shrink-0 bg-stone-100 rounded-md overflow-hidden border border-stone-100">
-                              <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
-                            </div>
-                            <div className="flex-grow min-w-0">
-                              <p className="text-sm font-medium text-stone-900 truncate">{item.title}</p>
-                              <p className="text-xs text-stone-500 mt-0.5">Qty: {item.quantity} × {formatPrice(item.price)}</p>
-                            </div>
-                            <div className="text-right flex-shrink-0 pl-2">
-                              <p className="font-medium text-emerald-900 text-sm">{formatPrice(item.price * item.quantity)}</p>
-                            </div>
-                          </li>
-                        ))}
-                      </ul>
-                      <div className="p-4 bg-stone-50 border-t border-stone-100 flex justify-between items-center">
-                        <span className="text-sm font-bold text-stone-600 uppercase tracking-wider">Subtotal</span>
-                        <span className="font-bold text-emerald-950 text-lg">{formatPrice(order.total)}</span>
-                      </div>
-                    </div>
-                  </div>
-
                 </div>
               )}
             </div>

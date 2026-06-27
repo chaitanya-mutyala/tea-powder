@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { useAuthStore } from '../store/authStore';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { Loader2 } from 'lucide-react';
 
 export default function Login() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+  const [loading, setLoading] = useState(false);
   const login = useAuthStore((state) => state.login);
   const signup = useAuthStore((state) => state.signup);
   const navigate = useNavigate();
@@ -14,6 +16,7 @@ export default function Login() {
   const handleAuth = async (e) => {
     e.preventDefault();
     setErrorMsg('');
+    setLoading(true);
     try {
       if (isSignUp) {
         await signup(email, password);
@@ -21,60 +24,72 @@ export default function Login() {
         await login(email, password);
       }
       const role = useAuthStore.getState().role;
-      if (role === 'admin') {
-        navigate('/admin');
-      } else {
-        navigate('/');
-      }
+      navigate(role === 'admin' ? '/admin' : '/');
     } catch (error) {
       console.error("Auth failed", error);
       setErrorMsg(error.message || "Authentication failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="flex justify-center items-center h-[calc(100vh-64px)] bg-stone-50">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md border border-stone-100">
-        <h2 className="text-3xl font-serif text-emerald-950 text-center mb-6">
+    <div className="min-h-[calc(100dvh-4rem)] flex items-center justify-center bg-cream-50 px-4 py-12">
+      <div className="card-elevated w-full max-w-md p-6 sm:p-8">
+        <h2 className="text-2xl sm:text-3xl font-serif text-emerald-950 text-center mb-2">
           {isSignUp ? "Create an Account" : "Welcome Back"}
         </h2>
-        {errorMsg && <p className="text-red-500 text-sm mb-4 text-center">{errorMsg}</p>}
+        <p className="text-center text-sm text-emerald-900/60 mb-6">
+          {isSignUp ? 'Join us for a personalized shopping experience.' : 'Sign in to access your orders and wishlist.'}
+        </p>
+        {errorMsg && (
+          <div className="text-red-700 text-sm mb-4 p-3 rounded-xl bg-red-50 border border-red-100 text-center" role="alert">
+            {errorMsg}
+          </div>
+        )}
         <form onSubmit={handleAuth} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-stone-700 mb-1">Email Address</label>
+            <label className="block text-xs font-bold text-emerald-950 uppercase tracking-wider mb-2">Email</label>
             <input 
               type="email" 
               required
-              className="block w-full rounded-md border-stone-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 p-2 border outline-none transition-colors"
+              autoComplete="email"
+              className="input-field"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-stone-700 mb-1">Password</label>
+            <label className="block text-xs font-bold text-emerald-950 uppercase tracking-wider mb-2">Password</label>
             <input 
               type="password" 
               required
-              className="block w-full rounded-md border-stone-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 p-2 border outline-none transition-colors"
+              autoComplete={isSignUp ? 'new-password' : 'current-password'}
+              className="input-field"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
           <button 
-            type="submit" 
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-emerald-900 hover:bg-emerald-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors duration-200 mt-6"
+            type="submit"
+            disabled={loading}
+            className="w-full btn-primary rounded-xl py-3.5 mt-2 disabled:opacity-50"
           >
-            {isSignUp ? "Sign Up" : "Sign In"}
+            {loading ? <span className="flex items-center justify-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /> Please wait...</span> : (isSignUp ? "Create Account" : "Sign In")}
           </button>
         </form>
-        <div className="mt-4 text-center">
+        <div className="mt-6 text-center">
           <button 
-            onClick={() => setIsSignUp(!isSignUp)}
-            className="text-sm text-emerald-700 hover:text-emerald-900 font-medium transition-colors"
+            type="button"
+            onClick={() => { setIsSignUp(!isSignUp); setErrorMsg(''); }}
+            className="text-sm text-emerald-700 hover:text-gold-600 font-medium transition-colors py-2"
           >
-            {isSignUp ? "Already have an account? Sign In" : "Don't have an account? Sign Up"}
+            {isSignUp ? "Already have an account? Sign in" : "Don't have an account? Sign up"}
           </button>
         </div>
+        <p className="text-center mt-4">
+          <Link to="/" className="text-xs text-emerald-900/50 hover:text-emerald-800">← Back to shop</Link>
+        </p>
       </div>
     </div>
   );

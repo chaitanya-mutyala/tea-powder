@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { db } from '../lib/firebase';
 import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
 
-export const useAdminStore = create((set) => ({
+export const useAdminStore = create((set, get) => ({
   products: [],
   orders: [],
   unsubscribeProducts: null,
@@ -11,17 +11,26 @@ export const useAdminStore = create((set) => ({
   initListeners: () => {
     if (!db) return;
 
+    const { unsubscribeProducts, unsubscribeOrders } = get();
+    unsubscribeProducts?.();
+    unsubscribeOrders?.();
+
     const unsubProducts = onSnapshot(collection(db, 'products'), (snapshot) => {
-      const productsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const productsData = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
       set({ products: productsData });
     });
 
     const unsubOrders = onSnapshot(collection(db, 'orders'), (snapshot) => {
-      const ordersData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const ordersData = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
       set({ orders: ordersData });
     });
 
     set({ unsubscribeProducts: unsubProducts, unsubscribeOrders: unsubOrders });
+
+    return () => {
+      unsubProducts();
+      unsubOrders();
+    };
   },
 
   addProduct: async (product) => {
@@ -37,7 +46,11 @@ export const useAdminStore = create((set) => ({
   },
   
   addOrder: async (order) => {
-    await addDoc(collection(db, 'orders'), { ...order, status: 'Pending Payment' });
+    const docRef = await addDoc(collection(db, 'orders'), {
+      ...order,
+      status: order.status || 'Pending Verification',
+    });
+    return docRef;
   },
 
   updateOrderStatus: async (id, status) => {
