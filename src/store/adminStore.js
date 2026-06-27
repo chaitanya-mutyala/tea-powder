@@ -5,6 +5,7 @@ import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc } from 'fireb
 export const useAdminStore = create((set, get) => ({
   products: [],
   orders: [],
+  productsLoaded: false,
   unsubscribeProducts: null,
   unsubscribeOrders: null,
 
@@ -17,7 +18,7 @@ export const useAdminStore = create((set, get) => ({
 
     const unsubProducts = onSnapshot(collection(db, 'products'), (snapshot) => {
       const productsData = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-      set({ products: productsData });
+      set({ products: productsData, productsLoaded: true });
     });
 
     const unsubOrders = onSnapshot(collection(db, 'orders'), (snapshot) => {

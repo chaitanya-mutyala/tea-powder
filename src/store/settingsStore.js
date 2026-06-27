@@ -48,8 +48,13 @@ export const useSettingsStore = create((set) => ({
 
     updateSettings: async (newSettings) => {
         try {
+            // Firestore throws an error if any field is undefined. Strip undefined fields.
+            const sanitizedSettings = Object.fromEntries(
+                Object.entries(newSettings).filter(([_, v]) => v !== undefined)
+            );
+            
             const settingsRef = doc(db, 'settings', 'global');
-            await setDoc(settingsRef, newSettings, { merge: true });
+            await setDoc(settingsRef, sanitizedSettings, { merge: true });
         } catch (error) {
             console.error("Error updating settings:", error);
             set({ error: error.message });

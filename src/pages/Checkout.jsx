@@ -223,12 +223,17 @@ export default function Checkout() {
                   
                   <div>
                     <label className="block text-xs font-bold text-emerald-950 uppercase tracking-wider mb-2">Payment Screenshot</label>
-                    <div className="relative flex justify-center px-4 sm:px-6 pt-5 pb-6 border-2 border-cream-200 border-dashed rounded-xl bg-cream-50 hover:bg-cream-100/80 transition-colors cursor-pointer overflow-hidden min-h-[10rem]">
+                    <div className="relative flex justify-center px-4 sm:px-6 pt-5 pb-6 border-2 border-cream-200 border-dashed rounded-xl bg-cream-50 hover:bg-cream-100/80 transition-colors cursor-pointer min-h-[10rem]">
+                      {/* File input always sits on top — outside pointer-events-none so mobile taps work */}
+                      <input
+                        type="file"
+                        required
+                        accept="image/*"
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                        onChange={handleFileChange}
+                      />
                       {screenshotPreview ? (
-                        <>
-                          <img src={screenshotPreview} alt="Payment screenshot preview" className="max-h-48 w-full object-contain" />
-                          <input type="file" required accept="image/*" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onChange={handleFileChange} />
-                        </>
+                        <img src={screenshotPreview} alt="Payment screenshot preview" className="max-h-48 w-full object-contain pointer-events-none" />
                       ) : (
                         <div className="space-y-2 text-center pointer-events-none">
                           <UploadCloud className="mx-auto h-10 w-10 text-emerald-900/30" />
@@ -236,7 +241,6 @@ export default function Checkout() {
                             <span className="font-semibold text-emerald-600">Tap to upload</span> payment screenshot
                           </p>
                           <p className="text-xs text-emerald-900/40">PNG or JPG, up to 5MB</p>
-                          <input type="file" required accept="image/*" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onChange={handleFileChange} />
                         </div>
                       )}
                     </div>

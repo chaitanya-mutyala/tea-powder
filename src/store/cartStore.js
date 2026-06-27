@@ -34,10 +34,10 @@ export const useCartStore = create((set, get) => ({
     const newItems = get().items.map(i => {
       if (i.id === id) {
         const newQ = i.quantity + amount;
-        return newQ > 0 ? { ...i, quantity: newQ } : i;
+        return newQ > 0 ? { ...i, quantity: newQ } : null;
       }
       return i;
-    });
+    }).filter(Boolean);
     set({ items: newItems });
     await persistCart(newItems);
   },

@@ -11,7 +11,7 @@ export default function Products() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
   
-  const initialForm = { title: '', price: '', weight: '', stock: '', category: 'Dairy', description: '', image: '', keyFeatures: '', storageInfo: '' };
+  const initialForm = { title: '', price: '', originalPrice: '', weight: '', stock: '', category: 'Dairy', description: '', image: '', keyFeatures: '', storageInfo: '' };
   const [formData, setFormData] = useState(initialForm);
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -65,6 +65,7 @@ export default function Products() {
       const data = {
         ...formData,
         price: Number(formData.price),
+        originalPrice: formData.originalPrice ? Number(formData.originalPrice) : null,
         stock: Number(formData.stock),
         image: imageUrl,
       };
@@ -260,6 +261,10 @@ export default function Products() {
                     <input required type="number" min="0" className="input-field" value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} />
                   </div>
                   <div>
+                    <label className="block admin-section-title mb-2">Original Price (₹)</label>
+                    <input type="number" min="0" className="input-field" value={formData.originalPrice || ''} onChange={e => setFormData({...formData, originalPrice: e.target.value})} placeholder="Optional MRP" />
+                  </div>
+                  <div>
                     <label className="block admin-section-title mb-2">Stock</label>
                     <input required type="number" min="0" className="input-field" value={formData.stock} onChange={e => setFormData({...formData, stock: e.target.value})} />
                   </div>
@@ -267,7 +272,7 @@ export default function Products() {
                     <label className="block admin-section-title mb-2">Weight / Volume</label>
                     <input required type="text" placeholder="500g, 1L" className="input-field" value={formData.weight} onChange={e => setFormData({...formData, weight: e.target.value})} />
                   </div>
-                  <div>
+                  <div className="sm:col-span-2">
                     <label className="block admin-section-title mb-2">Category</label>
                     <select className="input-field" value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})}>
                       <option>Dairy</option>

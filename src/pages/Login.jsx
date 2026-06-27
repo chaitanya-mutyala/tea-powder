@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuthStore } from '../store/authStore';
 import { useNavigate, Link } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Mail, Lock } from 'lucide-react';
 
 export default function Login() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -23,72 +23,111 @@ export default function Login() {
       } else {
         await login(email, password);
       }
-      const role = useAuthStore.getState().role;
-      navigate(role === 'admin' ? '/admin' : '/');
+      const isAdmin = email.trim() === 'chaitanyamutyala456@gmail.com';
+      navigate(isAdmin ? '/admin' : '/');
     } catch (error) {
-      console.error("Auth failed", error);
-      setErrorMsg(error.message || "Authentication failed. Please try again.");
+      console.error('Auth failed', error);
+      setErrorMsg(error.message || 'Authentication failed. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-[calc(100dvh-4rem)] flex items-center justify-center bg-cream-50 px-4 py-12">
-      <div className="card-elevated w-full max-w-md p-6 sm:p-8">
-        <h2 className="text-2xl sm:text-3xl font-serif text-emerald-950 text-center mb-2">
-          {isSignUp ? "Create an Account" : "Welcome Back"}
-        </h2>
-        <p className="text-center text-sm text-emerald-900/60 mb-6">
-          {isSignUp ? 'Join us for a personalized shopping experience.' : 'Sign in to access your orders and wishlist.'}
-        </p>
+    <div className="min-h-[calc(100dvh-5rem)] flex items-center justify-center bg-cream-50 px-4 py-12 sm:py-16">
+
+      {/* Card */}
+      <div className="w-full max-w-[22rem] sm:max-w-sm">
+
+        {/* Logo area */}
+        <div className="text-center mb-8">
+          <div className="inline-flex w-14 h-14 rounded-2xl bg-emerald-950 items-center justify-center mb-5 shadow-lg shadow-emerald-950/20">
+            <span className="text-gold-400 font-serif text-2xl font-bold">A</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-serif font-bold text-emerald-950 mb-1.5">
+            {isSignUp ? 'Create Account' : 'Welcome Back'}
+          </h1>
+          <p className="text-sm text-stone-500">
+            {isSignUp
+              ? 'Join us for a personalised experience.'
+              : 'Sign in to access your orders and wishlist.'}
+          </p>
+        </div>
+
+        {/* Tab switcher */}
+        <div className="flex bg-cream-100 rounded-xl p-1 mb-6 border border-cream-200">
+          {['Sign In', 'Sign Up'].map((label, i) => (
+            <button
+              key={label}
+              type="button"
+              onClick={() => { setIsSignUp(i === 1); setErrorMsg(''); }}
+              className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all duration-200 ${
+                (i === 0) === !isSignUp
+                  ? 'bg-white text-emerald-950 shadow-sm'
+                  : 'text-stone-500 hover:text-emerald-900'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {/* Error */}
         {errorMsg && (
-          <div className="text-red-700 text-sm mb-4 p-3 rounded-xl bg-red-50 border border-red-100 text-center" role="alert">
+          <div className="mb-5 p-3.5 rounded-xl bg-red-50 border border-red-200/80 text-red-800 text-sm leading-relaxed" role="alert">
             {errorMsg}
           </div>
         )}
+
+        {/* Form */}
         <form onSubmit={handleAuth} className="space-y-4">
+          {/* Email */}
           <div>
-            <label className="block text-xs font-bold text-emerald-950 uppercase tracking-wider mb-2">Email</label>
-            <input 
-              type="email" 
-              required
-              autoComplete="email"
-              className="input-field"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
+            <label className="block text-xs font-semibold text-emerald-950 uppercase tracking-wider mb-2">Email</label>
+            <div className="relative">
+              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400 pointer-events-none" />
+              <input
+                type="email"
+                required
+                autoComplete="email"
+                className="input-field pl-10"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
           </div>
+
+          {/* Password */}
           <div>
-            <label className="block text-xs font-bold text-emerald-950 uppercase tracking-wider mb-2">Password</label>
-            <input 
-              type="password" 
-              required
-              autoComplete={isSignUp ? 'new-password' : 'current-password'}
-              className="input-field"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+            <label className="block text-xs font-semibold text-emerald-950 uppercase tracking-wider mb-2">Password</label>
+            <div className="relative">
+              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400 pointer-events-none" />
+              <input
+                type="password"
+                required
+                autoComplete={isSignUp ? 'new-password' : 'current-password'}
+                className="input-field pl-10"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
           </div>
-          <button 
+
+          <button
             type="submit"
             disabled={loading}
-            className="w-full btn-primary rounded-xl py-3.5 mt-2 disabled:opacity-50"
+            className="w-full btn-accent rounded-xl py-3.5 mt-2"
           >
-            {loading ? <span className="flex items-center justify-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /> Please wait...</span> : (isSignUp ? "Create Account" : "Sign In")}
+            {loading
+              ? <><Loader2 className="w-4 h-4 animate-spin" /> Please wait…</>
+              : isSignUp ? 'Create Account' : 'Sign In'}
           </button>
         </form>
-        <div className="mt-6 text-center">
-          <button 
-            type="button"
-            onClick={() => { setIsSignUp(!isSignUp); setErrorMsg(''); }}
-            className="text-sm text-emerald-700 hover:text-gold-600 font-medium transition-colors py-2"
-          >
-            {isSignUp ? "Already have an account? Sign in" : "Don't have an account? Sign up"}
-          </button>
-        </div>
-        <p className="text-center mt-4">
-          <Link to="/" className="text-xs text-emerald-900/50 hover:text-emerald-800">← Back to shop</Link>
+
+        <p className="mt-6 text-center text-xs text-stone-400">
+          <Link to="/" className="hover:text-emerald-800 transition-colors">← Back to shop</Link>
         </p>
       </div>
     </div>

@@ -7,6 +7,16 @@ import { useWishlistStore } from '../store/wishlistStore';
 import { useSettingsStore } from '../store/settingsStore';
 import logo from '../assets/logo.png';
 
+function InstagramIcon({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
 export default function Navbar() {
   const { isAuthenticated, role, logout } = useAuthStore();
   const items = useCartStore((state) => state.items);
@@ -15,12 +25,22 @@ export default function Navbar() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const urlQuery = searchParams.get('q') || '';
+
+  const cartCount = items.reduce((sum, item) => sum + item.quantity, 0);
+  const wishlistCount = wishlistItems.length;
 
   useEffect(() => {
     document.body.style.overflow = isMobileMenuOpen ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
   }, [isMobileMenuOpen]);
+
+  useEffect(() => {
+    const onScroll = () => setIsScrolled(window.scrollY > 8);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -44,62 +64,91 @@ export default function Navbar() {
     submitSearch(input?.value || '');
   };
 
-  const navLinkClass = 'block py-3 px-4 rounded-xl text-base font-medium text-emerald-950 hover:bg-cream-50 transition-colors min-h-11';
+  const navLinkBase = 'block py-3 px-4 rounded-xl text-[15px] font-medium text-emerald-950 hover:bg-cream-100 hover:text-emerald-800 transition-colors min-h-11 flex items-center';
 
   return (
     <>
-      <nav className="bg-white/95 backdrop-blur-md border-b border-cream-200 sticky top-0 z-40 shadow-sm">
+      <nav
+        className={`bg-cream-50/95 backdrop-blur-md sticky top-0 z-40 transition-all duration-300 ${isScrolled
+            ? 'border-b border-cream-200 shadow-[0_1px_12px_-2px_rgb(1_26_19/0.08)]'
+            : 'border-b border-cream-100'
+          }`}
+      >
         <div className="page-container">
-          <div className="flex justify-between h-16 sm:h-[4.5rem] items-center gap-3">
+          <div className="flex justify-between h-[4.25rem] sm:h-[4.75rem] items-center gap-3">
+
+            {/* Mobile: hamburger */}
             <div className="flex items-center md:hidden shrink-0">
               <button
                 type="button"
                 onClick={() => setIsMobileMenuOpen(true)}
-                className="btn-icon text-emerald-950 -ml-2"
+                className="btn-icon text-emerald-900 hover:bg-cream-100 -ml-2"
                 aria-label="Open menu"
               >
-                <Menu className="h-6 w-6" />
+                <Menu className="h-5 w-5" />
               </button>
             </div>
 
+            {/* Logo */}
             <div className="flex-shrink-0 flex items-center justify-center md:justify-start flex-1 md:flex-none min-w-0">
-              <Link to="/" className="flex items-center gap-2 sm:gap-3 group min-w-0">
-                <img
-                  src={logo}
-                  alt={`${settings.businessName} Logo`}
-                  className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover border border-cream-200 group-hover:border-gold-500 transition-colors shrink-0"
-                />
-                <span className="text-base sm:text-xl font-serif font-bold text-emerald-950 truncate max-w-[9rem] sm:max-w-none group-hover:text-gold-600 transition-colors">
+              <Link to="/" className="flex items-center gap-2.5 group min-w-0">
+                <div className="relative shrink-0">
+                  <img
+                    src={logo}
+                    alt={`${settings.businessName} Logo`}
+                    className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover border-2 border-cream-200 group-hover:border-gold-400 transition-colors duration-300"
+                  />
+                  <div className="absolute inset-0 rounded-full ring-1 ring-gold-400/0 group-hover:ring-gold-400/30 transition-all duration-300" />
+                </div>
+                <div className="min-w-0 hidden sm:block">
+                  <span className="block text-[15px] sm:text-lg font-serif font-bold text-emerald-950 truncate group-hover:text-gold-600 transition-colors duration-300 leading-tight">
+                    {settings.businessName}
+                  </span>
+                  <span className="block text-[10px] font-medium tracking-[0.15em] text-stone-400 uppercase">
+                    Since 2026
+                  </span>
+                </div>
+                <span className="sm:hidden text-[15px] font-serif font-bold text-emerald-950 truncate max-w-[8rem] group-hover:text-gold-600 transition-colors">
                   {settings.businessName}
                 </span>
               </Link>
             </div>
-            
+
+            {/* Desktop Search */}
             <form key={urlQuery} onSubmit={handleSearchSubmit} className="hidden md:flex flex-1 justify-center px-6 max-w-lg mx-auto">
-              <div className="relative w-full">
-                <input 
+              <div className="relative w-full group">
+                <input
                   type="search"
                   defaultValue={urlQuery}
                   placeholder="Search products..."
-                  className="input-field rounded-full pl-10 py-2.5 text-sm"
+                  className="w-full h-10 pl-10 pr-4 bg-cream-100 border border-cream-200 rounded-full text-sm text-emerald-950 placeholder:text-stone-400 font-medium transition-all duration-200 focus:outline-none focus:bg-white focus:border-gold-400 focus:ring-2 focus:ring-gold-400/15 hover:border-cream-300"
                   aria-label="Search products"
                 />
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-emerald-900/40 pointer-events-none" />
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400 pointer-events-none transition-colors group-focus-within:text-gold-500" />
               </div>
             </form>
 
-            <div className="flex items-center gap-1 sm:gap-2 md:gap-3 shrink-0">
+            {/* Right Actions */}
+            <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
+
               {role === 'admin' && (
-                <Link to="/admin" className="hidden md:inline-flex btn-ghost text-xs uppercase tracking-widest px-3">
+                <Link
+                  to="/admin"
+                  className="hidden md:inline-flex items-center h-9 px-4 rounded-lg text-xs font-semibold uppercase tracking-widest text-emerald-900 hover:text-emerald-950 hover:bg-cream-100 transition-colors"
+                >
                   Admin
                 </Link>
               )}
-              
+
               {isAuthenticated && role !== 'admin' && (
-                <Link to="/dashboard" className="btn-icon text-emerald-950 hover:text-gold-600 relative hidden sm:inline-flex" aria-label="Wishlist">
-                  <Heart className="h-5 w-5 sm:h-6 sm:w-6" />
+                <Link
+                  to="/dashboard"
+                  className="btn-icon text-stone-600 hover:text-gold-600 hover:bg-cream-100 relative hidden sm:inline-flex"
+                  aria-label="Wishlist"
+                >
+                  <Heart className="h-5 w-5 sm:h-[1.15rem] sm:w-[1.15rem]" />
                   {wishlistCount > 0 && (
-                    <span className="absolute top-1 right-1 bg-gold-500 text-white text-[10px] font-bold rounded-full h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center border-2 border-white">
+                    <span className="absolute -top-0.5 -right-0.5 bg-gold-500 text-white text-[9px] font-bold rounded-full h-[18px] w-[18px] flex items-center justify-center border-2 border-cream-50 leading-none">
                       {wishlistCount > 9 ? '9+' : wishlistCount}
                     </span>
                   )}
@@ -107,10 +156,14 @@ export default function Navbar() {
               )}
 
               {role !== 'admin' && (
-                <Link to="/cart" className="btn-icon text-emerald-950 hover:text-gold-600 relative" aria-label="Cart">
-                  <ShoppingBag className="h-5 w-5 sm:h-6 sm:w-6" />
+                <Link
+                  to="/cart"
+                  className="btn-icon text-stone-600 hover:text-emerald-900 hover:bg-cream-100 relative"
+                  aria-label="Cart"
+                >
+                  <ShoppingBag className="h-5 w-5 sm:h-[1.15rem] sm:w-[1.15rem]" />
                   {cartCount > 0 && (
-                    <span className="absolute top-1 right-1 bg-emerald-600 text-white text-[10px] font-bold rounded-full h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center border-2 border-white">
+                    <span className="absolute -top-0.5 -right-0.5 bg-emerald-800 text-white text-[9px] font-bold rounded-full h-[18px] w-[18px] flex items-center justify-center border-2 border-cream-50 leading-none">
                       {cartCount > 9 ? '9+' : cartCount}
                     </span>
                   )}
@@ -121,14 +174,18 @@ export default function Navbar() {
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="btn-icon text-emerald-950 hover:text-gold-600 hidden md:inline-flex"
+                  className="btn-icon text-stone-500 hover:text-red-600 hover:bg-red-50 hidden md:inline-flex"
                   aria-label="Log out"
                 >
-                  <LogOut className="h-5 w-5 sm:h-6 sm:w-6" />
+                  <LogOut className="h-[1.1rem] w-[1.1rem]" />
                 </button>
               ) : (
-                <Link to="/login" className="btn-icon text-emerald-950 hover:text-gold-600 hidden md:inline-flex" aria-label="Sign in">
-                  <User className="h-5 w-5 sm:h-6 sm:w-6" />
+                <Link
+                  to="/login"
+                  className="btn-icon text-stone-600 hover:text-emerald-900 hover:bg-cream-100 hidden md:inline-flex"
+                  aria-label="Sign in"
+                >
+                  <User className="h-5 w-5" />
                 </Link>
               )}
             </div>
@@ -141,69 +198,129 @@ export default function Navbar() {
         className={`md:hidden fixed inset-0 z-50 transition-opacity duration-300 ${isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
         aria-hidden={!isMobileMenuOpen}
       >
+        {/* Backdrop */}
         <div
-          className="absolute inset-0 bg-emerald-950/40 backdrop-blur-[2px]"
+          className="absolute inset-0 bg-emerald-950/50 backdrop-blur-sm"
           onClick={() => setIsMobileMenuOpen(false)}
         />
+
+        {/* Drawer panel */}
         <div
-          className={`absolute top-0 left-0 w-[min(85vw,20rem)] h-full bg-white shadow-2xl flex flex-col transition-transform duration-300 ease-out safe-bottom ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}
+          className={`absolute top-0 left-0 w-[min(84vw,22rem)] h-full bg-cream-50 shadow-2xl flex flex-col transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] safe-bottom ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}
           onClick={(e) => e.stopPropagation()}
           role="dialog"
           aria-modal="true"
           aria-label="Navigation menu"
         >
-          <div className="flex justify-between items-center p-4 border-b border-cream-200">
-            <span className="text-lg font-serif font-bold text-emerald-950 truncate pr-2">{settings.businessName}</span>
+          {/* Header */}
+          <div className="flex justify-between items-center px-5 py-4 border-b border-cream-200 bg-white">
+            <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-2.5">
+              <img src={logo} alt="Logo" className="w-9 h-9 rounded-full object-cover border border-cream-200" />
+              <div>
+                <span className="block text-sm font-serif font-bold text-emerald-950 leading-tight">{settings.businessName}</span>
+                <span className="block text-[10px] tracking-widest text-stone-400 uppercase">Premium Dairy</span>
+              </div>
+            </Link>
             <button
               type="button"
               onClick={() => setIsMobileMenuOpen(false)}
-              className="btn-icon text-emerald-950 shrink-0"
+              className="btn-icon text-stone-500 hover:text-emerald-950 hover:bg-cream-100 -mr-1"
               aria-label="Close menu"
             >
-              <X className="h-6 w-6" />
+              <X className="h-5 w-5" />
             </button>
           </div>
-          
-          <div className="p-4 border-b border-cream-100">
+
+          {/* Search */}
+          <div className="px-4 py-3 border-b border-cream-100 bg-cream-50">
             <form key={`mobile-${urlQuery}`} onSubmit={handleSearchSubmit}>
               <div className="relative">
-                <input 
+                <input
                   type="search"
                   defaultValue={urlQuery}
                   placeholder="Search products..."
-                  className="input-field pl-10 text-sm"
+                  className="w-full h-10 pl-9 pr-4 bg-white border border-cream-200 rounded-xl text-sm text-emerald-950 placeholder:text-stone-400 font-medium focus:outline-none focus:border-gold-400 focus:ring-2 focus:ring-gold-400/15"
                   aria-label="Search products"
                 />
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-emerald-900/40 pointer-events-none" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-stone-400 pointer-events-none" />
               </div>
             </form>
           </div>
 
-          <nav className="flex-1 overflow-y-auto p-3 space-y-1">
+          {/* Nav links */}
+          <nav className="flex-1 overflow-y-auto p-3 space-y-0.5">
+            <p className="px-4 pt-2 pb-1.5 text-[10px] font-semibold uppercase tracking-widest text-stone-400">Navigation</p>
+
             {role === 'admin' ? (
-              <Link to="/admin" className={navLinkClass} onClick={() => setIsMobileMenuOpen(false)}>Admin Dashboard</Link>
+              <Link to="/admin" className={navLinkBase} onClick={() => setIsMobileMenuOpen(false)}>
+                Admin Dashboard
+              </Link>
             ) : (
               <>
-                <Link to="/" className={navLinkClass} onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
-                <Link to="/cart" className={navLinkClass} onClick={() => setIsMobileMenuOpen(false)}>Cart {cartCount > 0 && `(${cartCount})`}</Link>
+                <Link to="/" className={navLinkBase} onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
+                <Link to="/cart" className={navLinkBase} onClick={() => setIsMobileMenuOpen(false)}>
+                  Cart
+                  {cartCount > 0 && (
+                    <span className="ml-auto bg-emerald-900 text-gold-400 text-[10px] font-bold px-2 py-0.5 rounded-full">{cartCount}</span>
+                  )}
+                </Link>
                 {isAuthenticated && (
                   <>
-                    <Link to="/dashboard" className={navLinkClass} onClick={() => setIsMobileMenuOpen(false)}>My Account</Link>
-                    <Link to="/dashboard" className={navLinkClass} onClick={() => setIsMobileMenuOpen(false)}>Wishlist {wishlistCount > 0 && `(${wishlistCount})`}</Link>
+                    <Link to="/dashboard" className={navLinkBase} onClick={() => setIsMobileMenuOpen(false)}>My Account</Link>
+                    <Link to="/dashboard" className={navLinkBase} onClick={() => setIsMobileMenuOpen(false)}>
+                      Wishlist
+                      {wishlistCount > 0 && (
+                        <span className="ml-auto bg-gold-100 text-gold-700 text-[10px] font-bold px-2 py-0.5 rounded-full">{wishlistCount}</span>
+                      )}
+                    </Link>
                   </>
                 )}
               </>
             )}
+
+            {settings.instagramUrl && (
+              <>
+                <div className="my-2 mx-4 h-px bg-cream-200" />
+                <p className="px-4 pb-1.5 text-[10px] font-semibold uppercase tracking-widest text-stone-400">Follow Us</p>
+                <a
+                  href={settings.instagramUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 py-3 px-4 rounded-xl text-[15px] font-medium text-pink-700 hover:bg-pink-50 transition-colors min-h-11"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <InstagramIcon className="w-5 h-5 shrink-0" />
+                  Instagram
+                </a>
+              </>
+            )}
           </nav>
 
-          <div className="p-4 border-t border-cream-200 mt-auto">
+          {/* Brand quote */}
+          <div className="mx-4 mb-3 px-4 py-4 bg-emerald-950 rounded-2xl text-center">
+            <p className="text-gold-400 font-serif text-sm leading-relaxed italic">
+              &ldquo;Pure from the farm, straight to your heart.&rdquo;
+            </p>
+            <p className="text-emerald-600 text-[10px] uppercase tracking-[0.2em] mt-2">{settings.businessName}</p>
+          </div>
+
+          {/* Bottom action */}
+          <div className="px-4 pb-5 pt-2">
             {isAuthenticated ? (
-              <button type="button" onClick={handleLogout} className={`${navLinkClass} w-full flex items-center text-left`}>
-                <LogOut className="h-5 w-5 mr-3 shrink-0" /> Log Out
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="w-full flex items-center justify-center gap-2.5 h-11 rounded-xl text-sm font-semibold text-red-700 border border-red-200 hover:bg-red-50 transition-colors"
+              >
+                <LogOut className="h-4 w-4" /> Log Out
               </button>
             ) : (
-              <Link to="/login" className={`${navLinkClass} flex items-center`} onClick={() => setIsMobileMenuOpen(false)}>
-                <User className="h-5 w-5 mr-3 shrink-0" /> Sign In
+              <Link
+                to="/login"
+                className="w-full flex items-center justify-center gap-2.5 h-11 rounded-xl text-sm font-semibold bg-emerald-950 text-gold-400 hover:bg-emerald-900 transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <User className="h-4 w-4" /> Sign In
               </Link>
             )}
           </div>

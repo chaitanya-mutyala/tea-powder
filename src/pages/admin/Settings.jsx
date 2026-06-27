@@ -51,7 +51,11 @@ export default function Settings() {
         const { url } = await uploadImageFile(qrFile);
         finalQrUrl = url;
         if (previousQr && previousQr !== url) {
-          await deleteStorageFile(previousQr);
+          try {
+            await deleteStorageFile(previousQr);
+          } catch (e) {
+            console.warn("Failed to delete previous QR image:", e);
+          }
         }
       }
 
