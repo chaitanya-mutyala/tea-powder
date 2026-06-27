@@ -19,14 +19,14 @@ export default function Home() {
 
   const searchFiltered = searchQuery
     ? products.filter(p =>
-        [p.title, p.category, p.description].some(
-          field => field?.toLowerCase().includes(searchQuery)
-        )
+      [p.title, p.category, p.description].some(
+        field => field?.toLowerCase().includes(searchQuery)
       )
+    )
     : products;
 
-  const filteredProducts = activeFilter === 'All' 
-    ? searchFiltered 
+  const filteredProducts = activeFilter === 'All'
+    ? searchFiltered
     : searchFiltered.filter(p => p.category === activeFilter);
 
   const isLoading = products.length === 0;
@@ -95,7 +95,7 @@ export default function Home() {
                 Every product is a testament to our commitment to quality, purity, and the rich heritage we proudly uphold.
               </p>
               <button type="button" className="flex items-center text-gold-600 font-bold tracking-widest uppercase text-sm hover:text-gold-500 transition-colors">
-                Discover Our Story <ArrowRight className="ml-2 w-5 h-5" />
+                Discover Our Story. <ArrowRight className="ml-2 w-5 h-5" />
               </button>
             </div>
           </div>
@@ -122,7 +122,7 @@ export default function Home() {
               </button>
             </div>
           )}
-          
+
           {/* Filter Tabs */}
           <div className="flex justify-start sm:justify-center gap-2 mb-8 sm:mb-12 overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
             {categories.map(category => (
@@ -130,11 +130,10 @@ export default function Home() {
                 key={category}
                 type="button"
                 onClick={() => setActiveFilter(category)}
-                className={`px-5 sm:px-8 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-bold tracking-wider uppercase transition-all duration-300 whitespace-nowrap shrink-0 min-h-11 ${
-                  activeFilter === category 
-                    ? 'bg-emerald-950 text-gold-400 shadow-md' 
+                className={`px-5 sm:px-8 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-bold tracking-wider uppercase transition-all duration-300 whitespace-nowrap shrink-0 min-h-11 ${activeFilter === category
+                    ? 'bg-emerald-950 text-gold-400 shadow-md'
                     : 'bg-cream-100 text-emerald-900/60 hover:bg-cream-200'
-                }`}
+                  }`}
               >
                 {category}
               </button>
@@ -172,7 +171,7 @@ export default function Home() {
         <div className="page-container text-center">
           <h2 className="text-3xl sm:text-4xl font-serif font-bold text-gold-400 mb-10 sm:mb-16">What Our Customers Say</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-8">
-            {[1,2,3].map((i) => (
+            {[1, 2, 3].map((i) => (
               <div key={i} className="bg-emerald-900/50 p-6 sm:p-8 rounded-2xl border border-emerald-800/80 backdrop-blur-sm text-left sm:text-center">
                 <div className="flex sm:justify-center mb-4">
                   {[...Array(5)].map((_, j) => <Star key={j} className="w-4 h-4 sm:w-5 sm:h-5 text-gold-400 fill-gold-400" />)}
