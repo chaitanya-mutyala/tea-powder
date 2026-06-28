@@ -112,8 +112,8 @@ export default function Checkout() {
     const whatsappUrl = buildWhatsAppOrderUrl(settings.whatsappNumber, {
       orderId: placedOrder?.id,
       customerName: formData.name,
-      total,
-      items,
+      total: placedOrder?.total,
+      items: placedOrder?.items,
     });
 
     return (
@@ -251,10 +251,10 @@ export default function Checkout() {
               <button 
                 type="submit" 
                 disabled={loading}
-                className="hidden lg:flex w-full btn-accent rounded-full py-4 uppercase tracking-widest text-sm shadow-lg"
+                className="flex w-full btn-accent rounded-full py-4 uppercase tracking-widest text-sm shadow-lg mt-6"
               >
                 {loading ? (
-                  <><Loader2 className="animate-spin h-5 w-5" /> {uploadProgress || 'Processing...'}</>
+                  <><Loader2 className="animate-spin h-5 w-5 mr-2" /> {uploadProgress || 'Processing...'}</>
                 ) : (
                   `Confirm Payment of ${formatPrice(total)}`
                 )}
@@ -298,21 +298,6 @@ export default function Checkout() {
         </div>
       </div>
 
-      {/* Mobile sticky submit */}
-      <div className="lg:hidden fixed bottom-0 inset-x-0 z-30 bg-white/95 backdrop-blur-md border-t border-cream-200 p-4 safe-bottom">
-        <button
-          type="submit"
-          form="checkout-form"
-          disabled={loading}
-          className="w-full btn-accent rounded-full py-3.5 uppercase tracking-widest text-sm"
-        >
-          {loading ? (
-            <><Loader2 className="animate-spin h-5 w-5" /> {uploadProgress || 'Processing...'}</>
-          ) : (
-            `Pay ${formatPrice(total)}`
-          )}
-        </button>
-      </div>
     </div>
   );
 }
