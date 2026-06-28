@@ -10,6 +10,8 @@ import { uploadImageFiles } from '../lib/appwrite';
 import { formatPrice, getReviewTimestamp } from '../lib/format';
 import PageLoader from '../components/ui/PageLoader';
 import { Star, Truck, Shield, Heart, ShoppingBag, ArrowLeft, Loader2 } from 'lucide-react';
+import SEO from '../components/SEO';
+import { SEO_CONFIG } from '../lib/seo.config';
 
 export default function ProductDetails() {
   const { id } = useParams();
@@ -108,8 +110,45 @@ export default function ProductDetails() {
     ? (reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length).toFixed(1)
     : null;
 
+  const productSchema = product ? {
+    "@context": "https://schema.org/",
+    "@type": "Product",
+    "name": product.title,
+    "image": product.image,
+    "description": product.description,
+    "brand": {
+      "@type": "Brand",
+      "name": SEO_CONFIG.businessName
+    },
+    "offers": {
+      "@type": "Offer",
+      "url": `${SEO_CONFIG.siteUrl}/product/${product.id}`,
+      "priceCurrency": "INR",
+      "price": product.price,
+      "availability": isOutOfStock ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
+      "itemCondition": "https://schema.org/NewCondition"
+    },
+    ...(avgRating ? {
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": avgRating,
+        "reviewCount": reviews.length
+      }
+    } : {})
+  } : null;
+
   return (
     <div className="bg-cream-50 min-h-screen pb-24 sm:pb-12">
+      {product && (
+        <SEO 
+          title={product.title} 
+          description={product.description?.substring(0, 160)}
+          image={product.image}
+          url={`/product/${product.id}`}
+          type="product"
+          schemaData={productSchema}
+        />
+      )}
       <div className="page-container py-6 sm:py-8">
         
         <button type="button" onClick={() => navigate(-1)} className="flex items-center text-emerald-900/60 hover:text-emerald-950 mb-6 sm:mb-8 transition-colors font-medium text-sm min-h-11">

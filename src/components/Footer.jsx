@@ -26,7 +26,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-10 sm:gap-12 lg:gap-8">
 
           {/* Brand column */}
-          <div className="sm:col-span-2 lg:col-span-5">
+          <div className="sm:col-span-2 lg:col-span-4">
             <h3 className="text-2xl sm:text-3xl font-serif font-bold text-gold-400 mb-3 leading-tight tracking-tight">
               {settings.businessName}
             </h3>
@@ -67,15 +67,15 @@ export default function Footer() {
           </div>
 
           {/* Quick Links */}
-          <div className="lg:col-span-3 lg:col-start-7">
+          <div className="lg:col-span-2">
             <h4 className="text-xs font-semibold text-emerald-400 mb-5 uppercase tracking-[0.18em]">Quick Links</h4>
             <ul className="space-y-3 text-sm">
               {[
                 { to: '/', label: 'Home' },
+                { to: '/about', label: 'About Us' },
                 { to: '/', label: 'Shop' },
                 { to: '/cart', label: 'Cart' },
                 { to: '/dashboard', label: 'My Account' },
-                { to: '/login', label: 'Sign In' },
               ].map(({ to, label }, index) => (
                 <li key={`${to}-${index}`}>
                   <Link
@@ -90,8 +90,31 @@ export default function Footer() {
             </ul>
           </div>
 
+          {/* Legal Links */}
+          <div className="lg:col-span-3">
+            <h4 className="text-xs font-semibold text-emerald-400 mb-5 uppercase tracking-[0.18em]">Legal</h4>
+            <ul className="space-y-3 text-sm">
+              {[
+                { to: '/privacy-policy', label: 'Privacy Policy' },
+                { to: '/terms', label: 'Terms & Conditions' },
+                { to: '/refund-policy', label: 'Refund Policy' },
+                { to: '/shipping-policy', label: 'Shipping Policy' },
+              ].map(({ to, label }) => (
+                <li key={to}>
+                  <Link
+                    to={to}
+                    className="inline-flex items-center gap-2 text-emerald-300/70 hover:text-gold-400 transition-colors py-0.5 group"
+                  >
+                    <span className="h-px w-4 bg-emerald-700 group-hover:w-6 group-hover:bg-gold-500 transition-all duration-300" />
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
           {/* Contact */}
-          <div className="lg:col-span-4">
+          <div className="lg:col-span-3">
             <h4 className="text-xs font-semibold text-emerald-400 mb-5 uppercase tracking-[0.18em]">Get in Touch</h4>
             <ul className="space-y-4 text-sm">
               {settings.contactEmail && (
@@ -131,7 +154,7 @@ export default function Footer() {
       <div className="border-t border-emerald-900/60">
         <div className="page-container py-5 flex flex-col sm:flex-row items-center justify-between gap-2 text-center">
           <p className="text-emerald-500/70 text-xs tracking-wide">
-            &copy; {new Date().getFullYear()} {settings.businessName}. All rights reserved.
+            &copy; {new Date().getFullYear()} {settings.businessName}. All rights reserved. | <Link to="/contact" className="hover:text-gold-400">Contact Us</Link>
           </p>
           <p className="text-emerald-600/50 text-[10px] tracking-widest uppercase">
             Made with care in Konaseema

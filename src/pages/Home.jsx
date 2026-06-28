@@ -6,6 +6,7 @@ import { ProductCardSkeleton } from '../components/ui/Skeleton';
 import EmptyState from '../components/ui/EmptyState';
 import { ArrowRight, Star, ShieldCheck, Truck, Leaf, Search, ChevronRight } from 'lucide-react';
 import { useSearchParams, Link } from 'react-router-dom';
+import SEO from '../components/SEO';
 
 export default function Home() {
   const products = useAdminStore((state) => state.products);
@@ -63,7 +64,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen overflow-x-hidden">
-
+      <SEO url="/" />
       {/* ── Hero ──────────────────────────────────────── */}
       <section className="relative bg-emerald-950 text-cream-50 overflow-hidden">
         {/* Background image */}
@@ -141,7 +142,9 @@ export default function Home() {
             <div className="flex-1 w-full relative">
               <img
                 src="https://images.unsplash.com/photo-1628088062854-d1870b4553da?q=80&w=1000&auto=format&fit=crop"
-                alt="Brand Story"
+                alt="Advitha Milk Products Brand Story"
+                loading="lazy"
+                decoding="async"
                 className="rounded-3xl shadow-2xl w-full aspect-[4/3] object-cover"
               />
               {/* Decorative offset border */}

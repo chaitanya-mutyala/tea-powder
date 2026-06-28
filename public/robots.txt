@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://advitha.vercel.app/sitemap.xml
