@@ -1,4 +1,5 @@
 export const ORDER_STATUSES = [
+  'Pending Payment',
   'Pending Verification',
   'Paid / Processing',
   'Packed',

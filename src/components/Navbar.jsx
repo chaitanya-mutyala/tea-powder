@@ -5,7 +5,8 @@ import { useAuthStore } from '../store/authStore';
 import { useCartStore } from '../store/cartStore';
 import { useWishlistStore } from '../store/wishlistStore';
 import { useSettingsStore } from '../store/settingsStore';
-import logo from '../assets/logo.png';
+import logo from '../assets/logo.webp';
+import logoFallback from '../assets/logo.png';
 
 function InstagramIcon({ className }) {
   return (
@@ -93,11 +94,16 @@ export default function Navbar() {
             <div className="flex-shrink-0 flex items-center justify-center md:justify-start flex-1 md:flex-none min-w-0">
               <Link to="/" className="flex items-center gap-2.5 group min-w-0">
                 <div className="relative shrink-0">
-                  <img
-                    src={logo}
-                    alt={`${settings.businessName} Logo`}
-                    className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover border-2 border-cream-200 group-hover:border-gold-400 transition-colors duration-300"
-                  />
+                  <picture>
+                    <source srcSet={logo} type="image/webp" />
+                    <img
+                      src={logoFallback}
+                      alt={`${settings.businessName} Logo`}
+                      width="44"
+                      height="44"
+                      className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover border-2 border-cream-200 group-hover:border-gold-400 transition-colors duration-300"
+                    />
+                  </picture>
                   <div className="absolute inset-0 rounded-full ring-1 ring-gold-400/0 group-hover:ring-gold-400/30 transition-all duration-300" />
                 </div>
                 <div className="min-w-0 hidden sm:block">
@@ -105,7 +111,7 @@ export default function Navbar() {
                     {settings.businessName}
                   </span>
                   <span className="block text-[10px] font-medium tracking-[0.15em] text-stone-400 uppercase">
-                    Since 2026
+                    Pure &amp; Fresh
                   </span>
                 </div>
                 <span className="sm:hidden text-[15px] font-serif font-bold text-emerald-950 truncate max-w-[8rem] group-hover:text-gold-600 transition-colors">
@@ -227,7 +233,10 @@ export default function Navbar() {
           {/* Header */}
           <div className="flex justify-between items-center px-5 py-4 border-b border-cream-200 bg-white">
             <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-2.5">
-              <img src={logo} alt="Logo" className="w-9 h-9 rounded-full object-cover border border-cream-200" />
+              <picture>
+                <source srcSet={logo} type="image/webp" />
+                <img src={logoFallback} alt="Logo" width="36" height="36" className="w-9 h-9 rounded-full object-cover border border-cream-200" />
+              </picture>
               <div>
                 <span className="block text-sm font-serif font-bold text-emerald-950 leading-tight">{settings.businessName}</span>
                 <span className="block text-[10px] tracking-widest text-stone-400 uppercase">Premium Dairy</span>

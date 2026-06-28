@@ -3,35 +3,31 @@ import { doc, setDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 
 const defaultSettings = {
-    businessName: "Advitha Food Products",
-    heroTitle: "Premium Quality Food Products",
-    heroSubtitle: "Fresh and authentic food products delivered right to your doorstep.",
-    contactEmail: "support@advithafoods.com",
-    contactPhone: "8688466966",
+    businessName: "Advitha Milk Products",
+    heroTitle: "Premium Quality Dairy Products",
+    heroSubtitle: "Fresh and authentic dairy products delivered right to your doorstep.",
+    contactEmail: "[EMAIL_ADDRESS]",
+    contactPhone: "8688466996",
     address: "Ambati Vari Veedhi, Gopalapuram, Konaseema",
-    whatsappNumber: "8688466966",
-    instagramUrl: "https://instagram.com/advithafoods",
-    upiId: "merchant@upi",
+    whatsappNumber: "8688466996",
+    instagramUrl: "",
+    upiId: "",
+    qrImageUrl: "",
     deliveryEstimate: "2-3 Business Days",
-    themePrimary: "#064e3b",
-    themeSecondary: "#d4af37",
-    seoDescription: "Premium food products from Advitha Food Products."
+    seoDescription: "Premium dairy products from Advitha Milk Products. Farm fresh, delivered to your doorstep."
 };
 
 export const useSettingsStore = create((set) => ({
     settings: defaultSettings,
     loading: true,
     error: null,
-    
+
     initSettingsListener: () => {
         const settingsRef = doc(db, 'settings', 'global');
-        
+
         const unsubscribe = onSnapshot(settingsRef, (docSnap) => {
             if (docSnap.exists()) {
                 const data = docSnap.data();
-                if (data.businessName === "Advitha Milk Products") {
-                    data.businessName = "Advitha Food Products";
-                }
                 set({ settings: { ...defaultSettings, ...data }, loading: false });
             } else {
                 // If it doesn't exist, we might want to create it with defaults
@@ -46,7 +42,7 @@ export const useSettingsStore = create((set) => ({
             console.error("Error fetching settings:", error);
             set({ error: error.message, loading: false });
         });
-        
+
         return unsubscribe;
     },
 
@@ -56,7 +52,7 @@ export const useSettingsStore = create((set) => ({
             const sanitizedSettings = Object.fromEntries(
                 Object.entries(newSettings).filter(([_, v]) => v !== undefined)
             );
-            
+
             const settingsRef = doc(db, 'settings', 'global');
             await setDoc(settingsRef, sanitizedSettings, { merge: true });
         } catch (error) {

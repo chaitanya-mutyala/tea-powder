@@ -6,6 +6,7 @@ import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
 import Navbar from './components/Navbar';
 import PageLoader from './components/ui/PageLoader';
+import ScrollToTop from './components/ScrollToTop';
 import { useAuthStore } from './store/authStore';
 import { useAdminStore } from './store/adminStore';
 import { useSettingsStore } from './store/settingsStore';
@@ -53,6 +54,7 @@ function App() {
   return (
     <HelmetProvider>
       <Router>
+        <ScrollToTop />
         <div className="min-h-screen flex flex-col bg-cream-50 text-emerald-950 font-sans overflow-x-hidden">
           <Banner />
           <Navbar />

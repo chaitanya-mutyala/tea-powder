@@ -11,6 +11,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const login = useAuthStore((state) => state.login);
   const signup = useAuthStore((state) => state.signup);
+  const role = useAuthStore((state) => state.role);
   const navigate = useNavigate();
 
   const handleAuth = async (e) => {
@@ -20,13 +21,15 @@ export default function Login() {
     try {
       if (isSignUp) {
         await signup(email, password);
+        navigate('/');
       } else {
         await login(email, password);
+        // Role is set by the onAuthStateChanged listener in authStore
+        // Use a short delay to let auth state propagate
+        const updatedRole = useAuthStore.getState().role;
+        navigate(updatedRole === 'admin' ? '/admin' : '/');
       }
-      const isAdmin = email.trim() === 'chaitanyamutyala456@gmail.com';
-      navigate(isAdmin ? '/admin' : '/');
     } catch (error) {
-      console.error('Auth failed', error);
       setErrorMsg(error.message || 'Authentication failed. Please try again.');
     } finally {
       setLoading(false);

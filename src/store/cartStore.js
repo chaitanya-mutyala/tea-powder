@@ -2,8 +2,16 @@ import { create } from 'zustand';
 import { db, auth } from '../lib/firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 
+const CART_KEY = 'advitha_guest_cart';
+
 const getLocalCart = () => {
-  const saved = localStorage.getItem('ambati_guest_cart');
+  // Migrate old key if present
+  const legacy = localStorage.getItem('ambati_guest_cart');
+  if (legacy) {
+    localStorage.setItem(CART_KEY, legacy);
+    localStorage.removeItem('ambati_guest_cart');
+  }
+  const saved = localStorage.getItem(CART_KEY);
   return saved ? JSON.parse(saved) : [];
 };
 
@@ -11,7 +19,7 @@ const persistCart = async (items) => {
   if (auth?.currentUser) {
     await setDoc(doc(db, 'carts', auth.currentUser.uid), { items });
   } else {
-    localStorage.setItem('ambati_guest_cart', JSON.stringify(items));
+    localStorage.setItem(CART_KEY, JSON.stringify(items));
   }
 };
 
@@ -77,7 +85,8 @@ export const useCartStore = create((set, get) => ({
 
       set({ items: mergedItems });
       await setDoc(cartRef, { items: mergedItems });
-      localStorage.removeItem('ambati_guest_cart');
+      localStorage.removeItem(CART_KEY);
+      localStorage.removeItem('ambati_guest_cart'); // clean up legacy
     } catch (error) {
       console.error("Failed to merge cart:", error);
     }
