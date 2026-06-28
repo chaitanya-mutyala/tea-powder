@@ -11,9 +11,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {
-        name: 'Advitha Milk Products',
+        name: 'Advitha Food Products',
         short_name: 'Advitha',
-        description: 'Premium quality dairy products from Konaseema',
+        description: 'Premium quality food products from Konaseema',
         theme_color: '#011a13',
         background_color: '#fdfaf4',
         display: 'standalone',

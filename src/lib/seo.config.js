@@ -1,10 +1,10 @@
 export const SEO_CONFIG = {
-  businessName: "Advitha Milk Products",
-  titleTemplate: "%s | Advitha Milk Products",
-  defaultTitle: "Advitha Milk Products | Premium Dairy",
-  defaultDescription: "Premium quality dairy products crafted with generations of care. Taste the authenticity of farm-fresh goodness, delivered to your doorstep.",
+  businessName: "Advitha Food Products",
+  titleTemplate: "%s | Advitha Food Products",
+  defaultTitle: "Advitha Food Products | Premium Quality",
+  defaultDescription: "Premium quality food products crafted with care. Taste the authenticity of pure goodness, delivered to your doorstep.",
   siteUrl: "https://advitha.vercel.app", // Replace with actual production URL
-  twitterHandle: "@advithamilk",
+  twitterHandle: "@advithafoods",
   socialPreviewImage: "/og-image.jpg",
   themeColor: "#011a13",
   address: {
@@ -16,7 +16,7 @@ export const SEO_CONFIG = {
   },
   contact: {
     telephone: "+91-8688466966",
-    email: "support@advithamilk.com"
+    email: "support@advithafoods.com"
   },
   geo: {
     latitude: "16.5912",

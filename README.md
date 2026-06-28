@@ -1,6 +1,6 @@
-# Advitha Milk Products
+# Advitha Food Products
 
-An elegant, fully-featured e-commerce platform built for selling premium tea powders and authentic dairy products. The application features a stunning modern UI, seamless guest checkout, and a powerful Admin Dashboard for managing live orders.
+An elegant, fully-featured e-commerce platform built for selling premium tea powders and food products. The application features a stunning modern UI, seamless guest checkout, and a powerful Admin Dashboard for managing live orders.
 
 ## 🚀 Live Demo & Deployment
 This project is configured for seamless deployment on **Vercel**. 

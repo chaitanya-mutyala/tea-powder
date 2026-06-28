@@ -4,7 +4,7 @@ import SEO from '../components/SEO';
 export default function Terms() {
   return (
     <div className="bg-cream-50 min-h-screen py-16">
-      <SEO title="Terms & Conditions" description="Terms and Conditions for Advitha Milk Products." url="/terms" />
+      <SEO title="Terms & Conditions" description="Terms and Conditions for Advitha Food Products." url="/terms" />
       <div className="page-container max-w-3xl">
         <h1 className="text-4xl font-serif font-bold text-emerald-950 mb-6">Terms & Conditions</h1>
         <div className="prose prose-emerald max-w-none text-stone-600">

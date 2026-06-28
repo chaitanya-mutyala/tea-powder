@@ -142,7 +142,7 @@ export default function Home() {
             <div className="flex-1 w-full relative">
               <img
                 src="https://images.unsplash.com/photo-1628088062854-d1870b4553da?q=80&w=1000&auto=format&fit=crop"
-                alt="Advitha Milk Products Brand Story"
+                alt="Advitha Food Products Brand Story"
                 loading="lazy"
                 decoding="async"
                 className="rounded-3xl shadow-2xl w-full aspect-[4/3] object-cover"

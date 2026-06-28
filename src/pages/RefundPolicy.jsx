@@ -4,7 +4,7 @@ import SEO from '../components/SEO';
 export default function RefundPolicy() {
   return (
     <div className="bg-cream-50 min-h-screen py-16">
-      <SEO title="Refund Policy" description="Refund and Return Policy for Advitha Milk Products." url="/refund-policy" />
+      <SEO title="Refund Policy" description="Refund and Return Policy for Advitha Food Products." url="/refund-policy" />
       <div className="page-container max-w-3xl">
         <h1 className="text-4xl font-serif font-bold text-emerald-950 mb-6">Refund Policy</h1>
         <div className="prose prose-emerald max-w-none text-stone-600">

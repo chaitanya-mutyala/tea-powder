@@ -4,7 +4,7 @@ import SEO from '../components/SEO';
 export default function ShippingPolicy() {
   return (
     <div className="bg-cream-50 min-h-screen py-16">
-      <SEO title="Shipping Policy" description="Shipping and Delivery Policy for Advitha Milk Products." url="/shipping-policy" />
+      <SEO title="Shipping Policy" description="Shipping and Delivery Policy for Advitha Food Products." url="/shipping-policy" />
       <div className="page-container max-w-3xl">
         <h1 className="text-4xl font-serif font-bold text-emerald-950 mb-6">Shipping Policy</h1>
         <div className="prose prose-emerald max-w-none text-stone-600">

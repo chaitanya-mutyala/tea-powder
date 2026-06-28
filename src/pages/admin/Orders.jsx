@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAdminStore } from '../../store/adminStore';
 import { ChevronDown, ChevronUp, MapPin, Package, User, Calendar, FileText, CheckCircle, XCircle, Truck, PackageCheck, AlertCircle } from 'lucide-react';
 import { formatPrice, formatDate } from '../../lib/format';
+import { getFileViewUrl } from '../../lib/appwrite';
 import { ORDER_STATUSES } from '../../lib/orderStatus';
 import EmptyState from '../../components/ui/EmptyState';
 
@@ -149,14 +150,21 @@ export default function Orders() {
                            <p className="text-[10px] uppercase tracking-wider text-stone-400 mb-1">UTR</p>
                            <p className="font-mono text-sm font-medium text-emerald-800 bg-emerald-50 p-2 rounded border border-emerald-100 break-all">{order.payment?.utr || 'N/A'}</p>
                         </div>
-                        {order.payment?.screenshotUrl && (
-                          <div>
-                            <p className="text-[10px] uppercase tracking-wider text-stone-400 mb-2">Screenshot</p>
-                            <a href={order.payment.screenshotUrl} target="_blank" rel="noopener noreferrer">
-                              <img src={order.payment.screenshotUrl} alt="Payment proof" className="w-full max-h-40 object-contain rounded-lg border border-stone-200 bg-stone-50" />
-                            </a>
-                          </div>
-                        )}
+                         {(() => {
+                            const imgSrc = order.payment?.screenshotUrl || (order.payment?.screenshotId ? getFileViewUrl(order.payment.screenshotId) : null);
+                            if (!imgSrc) return null;
+                            return (
+                              <div>
+                                <p className="text-[10px] uppercase tracking-wider text-stone-400 mb-2">Screenshot</p>
+                                <a href={imgSrc} target="_blank" rel="noopener noreferrer" className="block group relative overflow-hidden rounded-lg border border-stone-200 bg-stone-50">
+                                  <img src={imgSrc} alt="Payment proof" className="w-full max-h-48 object-contain transition-transform group-hover:scale-105" />
+                                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-semibold">
+                                    Click to View Full Image
+                                  </div>
+                                </a>
+                              </div>
+                            );
+                         })()}
                         {order.status === 'Pending Verification' && (
                           <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg flex items-start gap-2">
                             <AlertCircle className="w-4 h-4 text-orange-600 shrink-0 mt-0.5" />

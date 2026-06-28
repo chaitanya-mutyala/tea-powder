@@ -3,19 +3,19 @@ import { doc, setDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 
 const defaultSettings = {
-    businessName: "Advitha Milk Products",
-    heroTitle: "Premium Quality Dairy Products",
-    heroSubtitle: "Fresh from the farm to your doorstep. Experience the richness of authentic dairy.",
-    contactEmail: "support@advithamilk.com",
+    businessName: "Advitha Food Products",
+    heroTitle: "Premium Quality Food Products",
+    heroSubtitle: "Fresh and authentic food products delivered right to your doorstep.",
+    contactEmail: "support@advithafoods.com",
     contactPhone: "8688466966",
     address: "Ambati Vari Veedhi, Gopalapuram, Konaseema",
     whatsappNumber: "8688466966",
-    instagramUrl: "https://instagram.com/advithamilk",
+    instagramUrl: "https://instagram.com/advithafoods",
     upiId: "merchant@upi",
     deliveryEstimate: "2-3 Business Days",
     themePrimary: "#064e3b",
     themeSecondary: "#d4af37",
-    seoDescription: "Premium dairy products from Advitha Milk Products."
+    seoDescription: "Premium food products from Advitha Food Products."
 };
 
 export const useSettingsStore = create((set) => ({
@@ -28,7 +28,11 @@ export const useSettingsStore = create((set) => ({
         
         const unsubscribe = onSnapshot(settingsRef, (docSnap) => {
             if (docSnap.exists()) {
-                set({ settings: { ...defaultSettings, ...docSnap.data() }, loading: false });
+                const data = docSnap.data();
+                if (data.businessName === "Advitha Milk Products") {
+                    data.businessName = "Advitha Food Products";
+                }
+                set({ settings: { ...defaultSettings, ...data }, loading: false });
             } else {
                 // If it doesn't exist, we might want to create it with defaults
                 setDoc(settingsRef, defaultSettings).then(() => {

@@ -1,19 +1,25 @@
 import { Client, Storage, ID } from "appwrite";
 
+const APPWRITE_URL = import.meta.env.VITE_APPWRITE_URL || "https://syd.cloud.appwrite.io/v1";
+const APPWRITE_PROJECT_ID = import.meta.env.VITE_APPWRITE_PROJECT_ID || "68c7f07b000ea45dca30";
+const APPWRITE_DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID || "68c7f19500054b00d3cb";
+const APPWRITE_BUCKET_ID = import.meta.env.VITE_APPWRITE_BUCKET_ID || "68c7f52500385b17c1c9";
+
 const client = new Client()
-    .setEndpoint(import.meta.env.VITE_APPWRITE_URL)
-    .setProject(import.meta.env.VITE_APPWRITE_PROJECT_ID);
+    .setEndpoint(APPWRITE_URL)
+    .setProject(APPWRITE_PROJECT_ID);
 
 const storage = new Storage(client);
 
 export const appwriteConfig = {
-    url: import.meta.env.VITE_APPWRITE_URL,
-    projectId: import.meta.env.VITE_APPWRITE_PROJECT_ID,
-    databaseId: import.meta.env.VITE_APPWRITE_DATABASE_ID,
-    storageId: import.meta.env.VITE_APPWRITE_BUCKET_ID,
+    url: APPWRITE_URL,
+    projectId: APPWRITE_PROJECT_ID,
+    databaseId: APPWRITE_DATABASE_ID,
+    storageId: APPWRITE_BUCKET_ID,
 };
 
 export function getFileViewUrl(fileId) {
+    if (!fileId) return '';
     return `${appwriteConfig.url}/storage/buckets/${appwriteConfig.storageId}/files/${fileId}/view?project=${appwriteConfig.projectId}`;
 }
 
@@ -24,6 +30,9 @@ export function extractFileIdFromUrl(url) {
 }
 
 export async function uploadImageFile(file) {
+    if (!appwriteConfig.storageId) {
+        throw new Error("Appwrite Storage Bucket ID is not configured.");
+    }
     const uploadedFile = await storage.createFile(
         appwriteConfig.storageId,
         ID.unique(),
@@ -49,7 +58,7 @@ export async function deleteStorageFile(fileIdOrUrl) {
     const fileId = fileIdOrUrl?.includes('/')
         ? extractFileIdFromUrl(fileIdOrUrl)
         : fileIdOrUrl;
-    if (!fileId) return;
+    if (!fileId || !appwriteConfig.storageId) return;
     try {
         await storage.deleteFile(appwriteConfig.storageId, fileId);
     } catch (err) {
@@ -58,3 +67,4 @@ export async function deleteStorageFile(fileIdOrUrl) {
 }
 
 export { client, storage, ID };
+

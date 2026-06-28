@@ -7,7 +7,7 @@ export default function Contact() {
     <div className="bg-cream-50 min-h-screen py-16">
       <SEO 
         title="Contact Us" 
-        description="Get in touch with Advitha Milk Products. Find our address, email, and phone number."
+        description="Get in touch with Advitha Food Products. Find our address, email, and phone number."
         url="/contact"
       />
       <div className="page-container max-w-4xl">

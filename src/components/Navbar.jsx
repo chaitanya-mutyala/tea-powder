@@ -143,6 +143,18 @@ export default function Navbar() {
               {isAuthenticated && role !== 'admin' && (
                 <Link
                   to="/dashboard"
+                  className="inline-flex items-center gap-1.5 h-9 px-3 rounded-lg text-xs font-semibold uppercase tracking-widest text-emerald-900 hover:text-emerald-950 hover:bg-cream-100 transition-colors"
+                  title="My Account"
+                  aria-label="My Account"
+                >
+                  <User className="h-4 w-4 text-emerald-700" />
+                  <span className="hidden sm:inline">My Account</span>
+                </Link>
+              )}
+
+              {isAuthenticated && role !== 'admin' && (
+                <Link
+                  to="/dashboard"
                   className="btn-icon text-stone-600 hover:text-gold-600 hover:bg-cream-100 relative hidden sm:inline-flex"
                   aria-label="Wishlist"
                 >
